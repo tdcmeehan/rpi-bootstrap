@@ -18,6 +18,17 @@
     password={{ password | password_hash('sha512') }}
   register: u
 
+- name: USER | Add system users to the system
+  user: >
+    name={{ item.name }}
+    shell={{ item.shell | default('/usr/sbin/nologin') }}
+    groups={{ item.groups | default('docker') }}
+    home=/home/{{ item.name }}
+    createhome=yes
+  with_items:
+    - "{{ dbs_users }}"
+  register: u
+
 - name: AUTHORIZED_KEY | Install SSH public key to pi user
   authorized_key: user=pi key="{{ dbs_ssh_pubkey }}"
   when: dbs_ssh_pubkey is defined
